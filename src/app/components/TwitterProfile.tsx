@@ -29,6 +29,7 @@ export default function TwitterProfile() {
         
         const userData = await response.json();
         setUser(userData);
+        console.log('User authenticated:', userData);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred');
       } finally {
@@ -38,6 +39,10 @@ export default function TwitterProfile() {
 
     fetchUserData();
   }, []);
+
+  const handleLogout = () => {
+    window.location.href = '/api/auth/twitter/logout';
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -62,22 +67,30 @@ export default function TwitterProfile() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-stone-900 rounded-lg shadow-md">
-      <div className="flex items-center space-x-4">
-        {user.profile_image_url && (
-          <img 
-            src={user.profile_image_url}
-            alt={user.name}
-            className="w-16 h-16 rounded-full"
-          />
-        )}
-        <div>
-          <h2 className="text-xl font-bold">{user.name}</h2>
-          <p className="text-gray-600">@{user.username}</p>
+    <div className="max-w-md mx-auto p-6 bg-card rounded-lg shadow-md">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          {user.profile_image_url && (
+            <img 
+              src={user.profile_image_url}
+              alt={user.name}
+              className="w-16 h-16 rounded-full"
+            />
+          )}
+          <div>
+            <h2 className="text-xl font-bold">{user.name}</h2>
+            <p className="text-muted-foreground">@{user.username}</p>
+          </div>
         </div>
+        <button 
+          onClick={handleLogout}
+          className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
       </div>
       {user.description && (
-        <p className="mt-4 text-gray-700">{user.description}</p>
+        <p className="mt-4 text-card-foreground">{user.description}</p>
       )}
     </div>
   );
