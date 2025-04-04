@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       }
       
       const tweet = await client.v2.tweet(post.content, {
-        media: mediaIds.length > 0 ? { media_ids: mediaIds } : undefined
+        media: mediaIds.length > 0 ? { media_ids: mediaIds.slice(0, 4) as [string] | [string, string] | [string, string, string] | [string, string, string, string] } : undefined
       });
       
       return NextResponse.json({ success: true, tweet });
