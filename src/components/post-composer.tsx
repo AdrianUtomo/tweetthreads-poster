@@ -182,7 +182,7 @@ export default function PostComposer() {
               <div className="flex-grow space-y-3">
                 <div className="flex items-start">
                   <Textarea
-                    ref={(el) => (textareaRefs.current[index] = el)}
+                    ref={(el) => { textareaRefs.current[index] = el }}
                     placeholder={index === 0 ? "What's happening?" : "Add to your thread..."}
                     className={cn(
                       "resize-none flex-grow transition-all duration-200",
@@ -292,4 +292,3 @@ export default function PostComposer() {
     </Card>
   )
 }
-

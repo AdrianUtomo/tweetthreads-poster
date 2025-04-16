@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       console.log('Posting single tweet:', post.content);
       
       // Handle media if present
-      let mediaIds: string[] = [];
+      const mediaIds: string[] = [];
       if (post.media && post.media.length > 0) {
         // This would require handling file uploads and using Twitter's media upload API
         // For simplicity, we're skipping media upload in this example
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       }
       
       const tweet = await client.v2.tweet(post.content, {
-        media: mediaIds.length > 0 ? { media_ids: mediaIds } : undefined
+        media: mediaIds.length > 0 ? { media_ids: mediaIds.slice(0, 4) as [string] | [string, string] | [string, string, string] | [string, string, string, string] } : undefined
       });
       
       return NextResponse.json({ success: true, tweet });
