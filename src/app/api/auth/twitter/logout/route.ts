@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  // Get the host from the request
-  const host = request.headers.get('host') || 'localhost:3000';
-  const protocol = host.includes('localhost') ? 'http' : 'https';
+  // Get URL information from the request URL
+  const { hostname, port, protocol: reqProtocol } = request.nextUrl;
+  
+  // Determine protocol based on hostname or use the request's protocol
+  const protocol = hostname.includes('localhost') ? 'http' : (reqProtocol || 'https');
+  
+  // Build the host string with port if it exists
+  const host = port ? `${hostname}:${port}` : hostname;
   
   // Construct the dynamic base URL
   const baseUrl = `${protocol}://${host}`;

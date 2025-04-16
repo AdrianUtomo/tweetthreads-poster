@@ -24,8 +24,20 @@ export async function GET(request: NextRequest) {
     const { accessToken, accessSecret } = 
       await client.login(oauth_verifier);
 
+    // Get URL information from the request URL
+    const { hostname, port, protocol: reqProtocol } = request.nextUrl;
+    
+    // Determine protocol based on hostname or use the request's protocol
+    const protocol = hostname.includes('localhost') ? 'http' : (reqProtocol || 'https');
+    
+    // Build the host string with port if it exists
+    const host = port ? `${hostname}:${port}` : hostname;
+    
+    // Construct the dynamic base URL
+    const baseUrl = `${protocol}://${host}`;
+
     // Store the tokens securely
-    const response = NextResponse.redirect(process.env.TWITTER_DEVELOPMENT_URL!);
+    const response = NextResponse.redirect(new URL('/', baseUrl));
     response.cookies.set('twitter_access_token', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
