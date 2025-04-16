@@ -2,14 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-interface TwitterUser {
-  id: string;
-  name: string;
-  username: string;
-  profile_image_url?: string;
-  description?: string;
-}
+import { TwitterUser } from '@/types';
 
 export default function TwitterProfile() {
   const [user, setUser] = useState<TwitterUser | null>(null);
