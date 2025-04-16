@@ -50,7 +50,7 @@ export default function TwitterProfile() {
 
   if (error) {
     return (
-      <div className="p-4 text-red-500">
+      <div className="flex flex-col items-center p-4 text-red-500">
         <p>{error}</p>
         <button 
           onClick={() => window.location.href = '/api/auth/twitter'}
