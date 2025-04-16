@@ -1,12 +1,19 @@
 // route.ts in /app/api/auth/twitter
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { twitterClient } from '@/lib/twitter';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Get the host from the request
+    const host = request.headers.get('host') || 'localhost:3000';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    
+    // Construct the dynamic callback URL
+    const callbackUrl = `${protocol}://${host}/api/auth/twitter/callback`;
+    
     const { url, oauth_token_secret } = await twitterClient.generateAuthLink(
-      process.env.TWITTER_CALLBACK_URL!,
+      callbackUrl,
       { linkMode: 'authorize' }
     );
 
