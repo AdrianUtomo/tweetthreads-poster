@@ -16,11 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
-
-interface PostData {
-  content: string
-  media: { url: string; type: string }[]
-}
+import { PostData, PostResult } from "@/types"
 
 export default function PostComposer() {
   const [posts, setPosts] = useState<PostData[]>([{ content: "", media: [] }])
@@ -29,7 +25,7 @@ export default function PostComposer() {
   const [isTwitterEnabled, setIsTwitterEnabled] = useState(true)
   const [isThreadsEnabled, setIsThreadsEnabled] = useState(true)
   const [isPosting, setIsPosting] = useState(false)
-  const [postResult, setPostResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [postResult, setPostResult] = useState<PostResult | null>(null)
   const { resolvedTheme } = useTheme()
   const textareaRefs = useRef<(HTMLTextAreaElement | null)[]>([])
 
@@ -79,20 +75,52 @@ export default function PostComposer() {
     }
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
 
     const updatedPosts = [...posts]
     const currentPost = updatedPosts[focusedPostIndex]
 
-    Array.from(files).forEach((file) => {
-      const url = URL.createObjectURL(file)
-      currentPost.media.push({ url, type: file.type.startsWith("image/") ? "image" : "gif" })
-    })
+    for (const file of Array.from(files)) {
+      try {
+        // Create object URL for preview
+        const url = URL.createObjectURL(file)
+        
+        // Convert file to base64
+        const buffer = await fileToBase64(file)
+        
+        currentPost.media.push({
+          url,
+          type: file.type,
+          buffer,
+          mimeType: file.type
+        })
+      } catch (error) {
+        console.error("Error processing media file:", error)
+      }
+    }
 
     setPosts(updatedPosts)
     e.target.value = ""
+  }
+  
+  // Helper function to convert File to base64 string
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          // Remove data URL prefix (e.g., "data:image/jpeg;base64,")
+          const base64 = reader.result.split(',')[1]
+          resolve(base64)
+        } else {
+          reject(new Error('Failed to convert file to base64'))
+        }
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
   }
 
   const removeMedia = (postIndex: number, mediaIndex: number) => {
